@@ -1,5 +1,10 @@
 # Change Log
 
+### 0.11.3
+
+* Remove travis ci
+* Change default configuration to use a separate JSON log
+
 ### 0.11.2
 
 * Resolve a bug with Action Cable registration [#286](https://github.com/roidrage/lograge/pull/286)

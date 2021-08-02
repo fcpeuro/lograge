@@ -1,5 +1,22 @@
-[![Build Status](https://travis-ci.org/roidrage/lograge.svg?branch=master)](https://travis-ci.org/roidrage/lograge)
-[![Gem Version](https://badge.fury.io/rb/lograge.svg)](http://badge.fury.io/rb/lograge)
+NOTE
+====
+
+This library is unmaintained but uses standard Rails interfaces without needing
+external libraries beyond version request_store gem, which is well-maintained
+and also uses standard Rails interfaces.
+
+The default config has been changed to use a separate JSON log.
+
+Now defaults to:
+
+- `config.lograge.keep_original_rails_log = true`
+- `config.lograge.logger = ActiveSupport::Logger.new "#{Rails.root}/log/lograge_#{Rails.env}.log"`
+- `config.lograge.formatter = Lograge::Formatters::Json.new`
+
+The setting `config.lograge.keep_original_rails_log = false` has not been
+validated to work beyond Rails 5 and is not recommended for any version because
+this will patch core rails classes to remove logging from them.
+
 
 Lograge - Taming Rails' Default Request Logging
 =======
