@@ -17,6 +17,58 @@ The setting `config.lograge.keep_original_rails_log = false` has not been
 validated to work beyond Rails 5 and is not recommended for any version because
 this will patch core rails classes to remove logging from them.
 
+Using
+-----
+
+This is all that should be necessary to use this gem in a rails app:
+
+In `Gemfile`
+
+```ruby
+# Used for creating ELK-compatible logs.
+gem 'lograge', '0.11.3', git: 'https://github.com/fcpeuro/lograge.git', tag: 'v0.11.3'
+```
+
+In `app/application_controller.rb` (or base controller class for the given project)
+
+```ruby
+# Add additional data to ELK-compatible log file.
+def append_info_to_payload payload
+  super
+
+  # If the request is from Cloudflare, remote_ip will be wrong.
+  cloudflare_ip = request.headers['HTTP_CF_CONNECTING_IP'].presence
+
+  payload[:current_user_id] = current_user&.id
+  payload[:ip] = request.remote_ip
+end
+```
+
+In `config/application.rb`
+```ruby
+# Add additional data to ELK-compatible log file.
+config.lograge.custom_options = lambda do |event|
+  exclude = %w(controller action format id)
+  payload = event.try(:payload) || {}
+
+  {
+    time:            Time.now.utc.strftime('%FT%TZ'),
+    ip:              payload[:ip],
+    current_user_id: payload[:current_user_id],
+    params:          payload[:params]&.except(*exclude),
+    error:           payload[:exception]&.join(': '), # ["Class", "message"]
+    # backtrace: payload[:exception_object]&.backtrace&.join('\n'),
+  }.compact
+end
+```
+
+In `config/environments/*.rbs` (Except testing.)
+
+```ruby
+# Create additional ELK-compatible log file in JSON format.
+config.lograge.enabled = true
+```
+
 
 Lograge - Taming Rails' Default Request Logging
 =======
