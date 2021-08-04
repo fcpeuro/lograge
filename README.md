@@ -40,7 +40,7 @@ def append_info_to_payload payload
   cloudflare_ip = request.headers['HTTP_CF_CONNECTING_IP'].presence
 
   payload[:current_user_id] = current_user&.id
-  payload[:ip] = request.remote_ip
+  payload[:ip] = cloudflare_ip || request.remote_ip
 end
 ```
 
